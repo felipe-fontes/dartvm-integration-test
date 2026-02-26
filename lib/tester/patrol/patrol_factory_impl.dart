@@ -79,12 +79,22 @@ class PatrolImpl implements ITester {
   }) async {
     final effectiveTimeout = timeout ?? const Duration(seconds: 10);
     final live = isLiveBinding;
-    debugPrint('⏳ [PatrolAction] Waiting for widget to become visible: $finder '
-        '(timeout: $effectiveTimeout, liveBinding: $live)');
+    debugPrint(
+      '⏳ [PatrolAction] Waiting for widget to become visible: $finder '
+      '(timeout: $effectiveTimeout, liveBinding: $live)',
+    );
 
+    const step = Duration(milliseconds: 100);
+    var attempts = 0;
+    var elapsed = Duration.zero;
     final stopwatch = Stopwatch()..start();
 
-    while (stopwatch.elapsed < effectiveTimeout) {
+    bool isTimedOut() {
+      if (live) return stopwatch.elapsed >= effectiveTimeout;
+      return elapsed >= effectiveTimeout;
+    }
+
+    while (!isTimedOut()) {
       // Drain stray async exceptions early so they don't silently corrupt
       // test state (critical for PreviewTestBinding).
       drainAndRethrowException(patrolTester.tester);
@@ -94,7 +104,7 @@ class PatrolImpl implements ITester {
         final hittestable = finder.hitTestable();
         if (hittestable.evaluate().isNotEmpty) {
           debugPrint('✅ [PatrolAction] Widget became visible after '
-              '${stopwatch.elapsed}: $finder');
+              '${live ? stopwatch.elapsed : elapsed}: $finder');
           if (settleDuration != null) {
             debugPrint('⏳ [PatrolAction] Settling for $settleDuration...');
             await pumpForDuration(patrolTester.tester,
@@ -107,12 +117,16 @@ class PatrolImpl implements ITester {
       // Pump in a binding-aware way:
       // - AutomatedTestWidgetsFlutterBinding: pump(100ms) advances the fake clock
       // - Live/Preview bindings: pump() renders immediately, real async progresses
-      await bindingAwarePump(patrolTester.tester);
+      attempts += 1;
+      await bindingAwarePump(patrolTester.tester, interval: step);
+      if (!live) {
+        elapsed += step;
+      }
     }
 
     final timeoutMessage =
         'Timeout waiting for widget to become visible: $finder '
-        'after ${stopwatch.elapsed}';
+        'after $attempts attempts over $effectiveTimeout';
     debugPrint('❌ [PatrolAction] $timeoutMessage');
     throw Exception(timeoutMessage);
   }

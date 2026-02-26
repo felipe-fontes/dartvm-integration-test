@@ -98,3 +98,34 @@ Future<void> pumpForDuration(
     }
   }
 }
+
+/// Pumps in a loop until [finder] is no longer found.
+///
+/// This is useful for waiting for transient UI (loading spinners, snackbars,
+/// dialogs) to be removed.
+///
+/// The timeout is measured in *pumped* time (sum of [step] durations), making
+/// it deterministic under FakeAsync widget tests.
+Future<void> pumpUntilNotFound(
+  WidgetTester tester,
+  Finder finder, {
+  Duration timeout = const Duration(seconds: 10),
+  Duration step = const Duration(milliseconds: 50),
+}) async {
+  var elapsed = Duration.zero;
+  while (elapsed < timeout) {
+    await tester.pump(step);
+    if (!tester.any(finder)) {
+      return;
+    }
+    elapsed += step;
+  }
+
+  // One last pump to give a more stable failure state.
+  await tester.pump();
+  expect(
+    tester.any(finder),
+    isFalse,
+    reason: 'Timed out waiting for widget to be removed: $finder',
+  );
+}
