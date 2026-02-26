@@ -1,6 +1,6 @@
 name: dartvm_integration_tests
 description: Run full app integration tests on the Dart VM with no devices, no drivers, no builds. Provides HTTP mocking, method channel mocking, a unified tester abstraction, and page object/flow patterns for fast, deterministic widget tests.
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/felipe-fontes/dartvm-integration-test
 repository: https://github.com/felipe-fontes/dartvm-integration-test
 issue_tracker: https://github.com/felipe-fontes/dartvm-integration-test/issues

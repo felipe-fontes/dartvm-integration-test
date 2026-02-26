@@ -1,3 +1,8 @@
+## 0.0.2
+
+* Add `pumpUntilNotFound` helper for deterministic “wait until removed” widget tests.
+* Stabilize Patrol `waitUntilVisible` timeout behavior under fake time.
+
 ## 0.0.1
 
 * Initial release.
