@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test_mock/integration_test_config.dart';
@@ -40,7 +41,7 @@ class IntegrationTest {
     tester.view.devicePixelRatio = 3.0;
     tester.platformDispatcher.textScaleFactorTestValue = 1.0;
 
-    //disableOverflowError();
+    disableOverflowError();
 
     await setupPreWidgetCreated?.call();
 
@@ -52,4 +53,24 @@ class IntegrationTest {
 
     return _testerFactory.createTester(tester);
   }
+}
+
+void disableOverflowError() {
+  // FlutterError.onError != FlutterError.presentError in Widget Test
+  // See test/error/disable_overflow_error_test.dart
+  FlutterExceptionHandler? originalOnError = FlutterError.onError;
+  FlutterError.onError = (details) {
+    bool isOverflowError = false;
+    final exception = details.exception;
+    if (exception is FlutterError) {
+      isOverflowError = exception.diagnostics.any(
+        (e) => e.value.toString().contains('A RenderFlex overflowed by'),
+      );
+    }
+    if (isOverflowError) {
+      debugPrint('A RenderFlex overflowed');
+    } else if (originalOnError != null) {
+      originalOnError(details);
+    }
+  };
 }

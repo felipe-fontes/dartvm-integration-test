@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:integration_test_mock/tester/binding_aware_pump.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
 abstract class ITester {
@@ -31,7 +32,15 @@ abstract class ITester {
     Finder finder, {
     Duration? timeout,
     Alignment alignment = Alignment.center,
+    Duration? settleDuration,
   });
+
+  /// Pumps for a total [duration], advancing time in steps.
+  ///
+  /// Works in both automated (fake async) and live/preview (real async)
+  /// bindings. Use after a widget is visible to let animations/loading
+  /// settle, or to drain pending timers at the end of a test.
+  Future<void> pumpFor(Duration duration, {Duration step});
 
   Future<void> tap(
     Finder finder, {

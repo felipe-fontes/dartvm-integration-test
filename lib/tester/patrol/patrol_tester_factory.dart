@@ -10,7 +10,7 @@ class PatrolTesterFactory implements TesterFactory {
   ITester createTester(WidgetTester tester) {
     return PatrolImpl(PatrolTester(
       tester: tester,
-      config: const PatrolTesterConfig(
+      config: PatrolTesterConfig(
         settlePolicy: SettlePolicy.noSettle,
       ),
     ));

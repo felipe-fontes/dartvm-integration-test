@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:integration_test_mock/tester/binding_aware_pump.dart';
 import 'package:integration_test_mock/tester/tester_interface.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
@@ -52,15 +53,13 @@ class FlutterTestNativeConfig {
       settleTimeout: settleTimeout ?? this.settleTimeout,
       settlePolicy: settlePolicy ?? this.settlePolicy,
       dragDuration: dragDuration ?? this.dragDuration,
-      settleBetweenScrollsTimeout:
-          settleBetweenScrollsTimeout ?? this.settleBetweenScrollsTimeout,
+      settleBetweenScrollsTimeout: settleBetweenScrollsTimeout ?? this.settleBetweenScrollsTimeout,
     );
   }
 }
 
 class FlutterTestNativeImpl implements ITester {
-  FlutterTestNativeImpl(this._tester,
-      {this.config = const FlutterTestNativeConfig()});
+  FlutterTestNativeImpl(this._tester, {this.config = const FlutterTestNativeConfig()});
 
   final WidgetTester _tester;
   final FlutterTestNativeConfig config;
@@ -112,9 +111,7 @@ class FlutterTestNativeImpl implements ITester {
     Duration? timeout,
   }) async {
     await _tester.pumpWidget(widget, duration: duration, phase: phase);
-    await _performPump(
-        settlePolicy: config.settlePolicy,
-        settleTimeout: timeout ?? config.settleTimeout);
+    await _performPump(settlePolicy: config.settlePolicy, settleTimeout: timeout ?? config.settleTimeout);
   }
 
   @override
@@ -123,8 +120,7 @@ class FlutterTestNativeImpl implements ITester {
     AxisDirection? direction,
     SettlePolicy? settlePolicy,
   }) async {
-    debugPrint(
-        '🔄 [NativeAction] Scrolling until visible: $matcher (direction: ${direction ?? AxisDirection.down})');
+    debugPrint('🔄 [NativeAction] Scrolling until visible: $matcher (direction: ${direction ?? AxisDirection.down})');
     final finder = _find(matcher);
     final scrollable = find.byType(Scrollable).first;
     final moveStep = _getScrollOffset(direction ?? AxisDirection.down);
@@ -157,8 +153,7 @@ class FlutterTestNativeImpl implements ITester {
     Duration? duration,
     EnginePhase phase = EnginePhase.sendSemanticsUpdate,
   ]) async {
-    debugPrint(
-        '⏳ [NativeAction] Pumping${duration != null ? ' for $duration' : ''}');
+    debugPrint('⏳ [NativeAction] Pumping${duration != null ? ' for $duration' : ''}');
     await _tester.pump(duration, phase);
   }
 
@@ -167,8 +162,7 @@ class FlutterTestNativeImpl implements ITester {
     Duration duration = const Duration(milliseconds: 100),
     Duration? timeout,
   }) async {
-    debugPrint(
-        '⏳ [NativeAction] Pumping and settling${timeout != null ? ' (timeout: $timeout)' : ''}');
+    debugPrint('⏳ [NativeAction] Pumping and settling${timeout != null ? ' (timeout: $timeout)' : ''}');
     await _tester.pumpAndSettle(
       duration,
       EnginePhase.sendSemanticsUpdate,
@@ -181,22 +175,38 @@ class FlutterTestNativeImpl implements ITester {
     Finder finder, {
     Duration? timeout,
     Alignment alignment = Alignment.center,
+    Duration? settleDuration,
   }) async {
-    debugPrint(
-        '⏳ [NativeAction] Waiting for widget to become visible: $finder${timeout != null ? ' (timeout: $timeout)' : ''}');
-    final endTime = timeout != null
-        ? DateTime.now().add(timeout)
-        : DateTime.now().add(config.visibleTimeout);
+    final effectiveTimeout = timeout ?? config.visibleTimeout;
+    final live = isLiveBinding;
+    debugPrint('⏳ [NativeAction] Waiting for widget to become visible: $finder '
+        '(timeout: $effectiveTimeout, liveBinding: $live)');
 
-    while (DateTime.now().isBefore(endTime)) {
-      if (finder.evaluate().isNotEmpty &&
-          finder.hitTestable().evaluate().isNotEmpty) {
+    final stopwatch = Stopwatch()..start();
+
+    while (stopwatch.elapsed < effectiveTimeout) {
+      // Drain stray async exceptions early so they don't silently corrupt
+      // test state (critical for PreviewTestBinding).
+      drainAndRethrowException(_tester);
+
+      if (finder.evaluate().isNotEmpty && finder.hitTestable().evaluate().isNotEmpty) {
+        debugPrint('✅ [NativeAction] Widget became visible after '
+            '${stopwatch.elapsed}: $finder');
+        if (settleDuration != null) {
+          debugPrint('⏳ [NativeAction] Settling for $settleDuration...');
+          await pumpForDuration(_tester, duration: settleDuration);
+        }
         return finder;
       }
-      await _tester.pump(const Duration(milliseconds: 100));
+
+      // Pump in a binding-aware way:
+      // - AutomatedTestWidgetsFlutterBinding: pump(100ms) advances the fake clock
+      // - Live/Preview bindings: pump() renders immediately, real async progresses
+      await bindingAwarePump(_tester);
     }
 
-    throw Exception('Timeout waiting for widget to become visible');
+    throw Exception('Timeout waiting for widget to become visible: $finder '
+        'after ${stopwatch.elapsed}');
   }
 
   @override
@@ -274,5 +284,14 @@ class FlutterTestNativeImpl implements ITester {
     } else {
       await _tester.pump();
     }
+  }
+
+  @override
+  Future<void> pumpFor(
+    Duration duration, {
+    Duration step = const Duration(milliseconds: 100),
+  }) async {
+    debugPrint('⏳ [NativeAction] Pumping for $duration...');
+    await pumpForDuration(_tester, duration: duration, step: step);
   }
 }
