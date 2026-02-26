@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test_mock/tester/binding_aware_pump.dart';
-import 'package:integration_test_mock/tester/tester_interface.dart';
+import 'package:dartvm_integration_tests/tester/binding_aware_pump.dart';
+import 'package:dartvm_integration_tests/tester/tester_interface.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
 /// Common configuration for [FlutterTestNativeImpl]

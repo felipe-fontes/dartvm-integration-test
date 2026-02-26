@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
-import 'package:integration_test_mock/network/integration_test_http_overrides.dart';
+import 'package:dartvm_integration_tests/network/integration_test_http_overrides.dart';
 
 /// A simple widget that makes HTTP requests to demonstrate interception
 class HttpTestWidget extends StatefulWidget {

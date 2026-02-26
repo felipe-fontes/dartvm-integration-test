@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test_mock/tester/binding_aware_pump.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
 abstract class ITester {

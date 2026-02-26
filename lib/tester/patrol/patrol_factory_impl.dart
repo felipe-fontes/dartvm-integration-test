@@ -1,8 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test_mock/tester/binding_aware_pump.dart';
-import 'package:integration_test_mock/tester/tester_interface.dart';
+import 'package:dartvm_integration_tests/tester/binding_aware_pump.dart';
+import 'package:dartvm_integration_tests/tester/tester_interface.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
 class PatrolImpl implements ITester {
@@ -41,7 +40,8 @@ class PatrolImpl implements ITester {
     AxisDirection? direction,
     SettlePolicy? settlePolicy,
   }) async {
-    debugPrint('🔄 [PatrolAction] Scrolling until visible: $matcher (direction: ${direction ?? AxisDirection.down})');
+    debugPrint(
+        '🔄 [PatrolAction] Scrolling until visible: $matcher (direction: ${direction ?? AxisDirection.down})');
     final finder = await patrolTester.scrollUntilVisible(
       scrollDirection: direction ?? AxisDirection.down,
       finder: matcher,
@@ -55,7 +55,8 @@ class PatrolImpl implements ITester {
     Duration? duration,
     EnginePhase phase = EnginePhase.sendSemanticsUpdate,
   ]) async {
-    debugPrint('⏳ [PatrolAction] Pumping${duration != null ? ' for $duration' : ''}');
+    debugPrint(
+        '⏳ [PatrolAction] Pumping${duration != null ? ' for $duration' : ''}');
     await patrolTester.pump(duration, phase);
   }
 
@@ -64,7 +65,8 @@ class PatrolImpl implements ITester {
     Duration duration = const Duration(milliseconds: 100),
     Duration? timeout,
   }) async {
-    debugPrint('⏳ [PatrolAction] Pumping and settling${timeout != null ? ' (timeout: $timeout)' : ''}');
+    debugPrint(
+        '⏳ [PatrolAction] Pumping and settling${timeout != null ? ' (timeout: $timeout)' : ''}');
     await patrolTester.pumpAndSettle(duration: duration);
   }
 
@@ -95,7 +97,8 @@ class PatrolImpl implements ITester {
               '${stopwatch.elapsed}: $finder');
           if (settleDuration != null) {
             debugPrint('⏳ [PatrolAction] Settling for $settleDuration...');
-            await pumpForDuration(patrolTester.tester, duration: settleDuration);
+            await pumpForDuration(patrolTester.tester,
+                duration: settleDuration);
           }
           return finder;
         }
@@ -107,7 +110,8 @@ class PatrolImpl implements ITester {
       await bindingAwarePump(patrolTester.tester);
     }
 
-    final timeoutMessage = 'Timeout waiting for widget to become visible: $finder '
+    final timeoutMessage =
+        'Timeout waiting for widget to become visible: $finder '
         'after ${stopwatch.elapsed}';
     debugPrint('❌ [PatrolAction] $timeoutMessage');
     throw Exception(timeoutMessage);

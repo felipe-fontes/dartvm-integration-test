@@ -1,4 +1,4 @@
-import 'package:integration_test_mock/tester/tester_interface.dart';
+import 'package:dartvm_integration_tests/tester/tester_interface.dart';
 
 class BasePageObject {
   final ITester $;

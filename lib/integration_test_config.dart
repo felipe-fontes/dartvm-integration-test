@@ -1,5 +1,4 @@
-import 'package:integration_test_mock/integration_test_mock.dart';
-import 'package:integration_test_mock/method_channel_mocks.dart';
+import 'package:dartvm_integration_tests/dartvm_integration_tests.dart';
 
 class IntegrationTestConfig {
   final IntegrationTestHttpOverrides httpOverrides;

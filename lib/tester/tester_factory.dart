@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test_mock/integration_test_mock.dart';
-import 'package:integration_test_mock/tester/native_tester.dart';
+import 'package:dartvm_integration_tests/dartvm_integration_tests.dart';
+import 'package:dartvm_integration_tests/tester/native_tester.dart';
 
 abstract class TesterFactory {
   ITester createTester(WidgetTester tester);

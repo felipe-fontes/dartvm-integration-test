@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
-import 'package:integration_test_mock/integration_test.dart';
-import 'package:integration_test_mock/integration_test_config.dart';
-import 'package:integration_test_mock/integration_test_mock.dart';
+import 'package:dartvm_integration_tests/integration_test.dart';
+import 'package:dartvm_integration_tests/integration_test_config.dart';
+import 'package:dartvm_integration_tests/dartvm_integration_tests.dart';
 
 /// A comprehensive test widget that demonstrates both HTTP and Method Channel usage
 class FullIntegrationTestWidget extends StatefulWidget {

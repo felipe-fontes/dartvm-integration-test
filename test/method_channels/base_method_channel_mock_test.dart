@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test_mock/method_channels/base_method_channel_mock.dart';
+import 'package:dartvm_integration_tests/method_channels/base_method_channel_mock.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

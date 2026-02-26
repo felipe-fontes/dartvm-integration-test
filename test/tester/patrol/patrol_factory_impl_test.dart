@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test_mock/tester/patrol/patrol_factory_impl.dart';
+import 'package:dartvm_integration_tests/tester/patrol/patrol_factory_impl.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
 void main() {

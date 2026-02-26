@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test_mock/integration_test_config.dart';
-import 'package:integration_test_mock/tester/tester_factory.dart';
-import 'package:integration_test_mock/tester/tester_interface.dart';
+import 'package:dartvm_integration_tests/integration_test_config.dart';
+import 'package:dartvm_integration_tests/tester/tester_factory.dart';
+import 'package:dartvm_integration_tests/tester/tester_interface.dart';
 
 class IntegrationTest {
   final IntegrationTestConfig _config;
@@ -27,7 +27,9 @@ class IntegrationTest {
   }) {
     final binding = TestWidgetsFlutterBinding.ensureInitialized();
 
+    // ignore: deprecated_member_use
     binding.window.physicalSizeTestValue = const Size(1440, 2960);
+    // ignore: deprecated_member_use
     binding.window.devicePixelRatioTestValue = 3.0;
   }
 
